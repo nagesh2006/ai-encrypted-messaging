@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+websockets
+supabase
+cryptography
+scikit-learn
+numpy
+pandas
+python-dotenv
+pydantic
+python-multipart
+scikit-fuzzy

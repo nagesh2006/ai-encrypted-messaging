@@ -1,0 +1,23 @@
+# Test Messages for AI Classification
+# Format: message_text | expected_classification
+
+Hello, how are you today? | ham
+Win $1000 now! Click this link! | spam
+You're an absolute moron | toxic
+Thanks for your help with the project | ham
+FREE MONEY! Act fast before it's gone! | spam
+I hope you die in a fire | toxic
+Can we meet for lunch tomorrow? | ham
+URGENT: Your account will be suspended! | spam
+You're completely worthless | toxic
+Good morning! Have a great day | ham
+Congratulations! You've won a prize! | spam
+You make me sick | toxic
+The meeting is scheduled for 3 PM | ham
+Hot singles in your area! | spam
+I can't stand you | toxic
+How was your weekend? | ham
+Get rich quick with this method! | spam
+You're such an idiot | toxic
+Please send me the report when ready | ham
+Limited time offer! Buy now! | spam
