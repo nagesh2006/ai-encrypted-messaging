@@ -70,14 +70,13 @@ async def send_message(message: MessageCreate):
 async def get_chat_messages(chat_partner_id: str, user_id: str):
     try:
         messages = await supabase_service.get_messages(user_id, chat_partner_id)
-        
+        print(f"Fetched messages: {messages}")
         # Decrypt messages for display
         decrypted_messages = []
         for msg in messages:
             try:
                 encrypted_data = json.loads(msg['encrypted_content'])
                 decrypted_content = crypto_manager.decrypt_message(encrypted_data)
-                
                 decrypted_msg = DecryptedMessage(
                     id=msg['id'],
                     sender_id=msg['sender_id'],
@@ -90,20 +89,21 @@ async def get_chat_messages(chat_partner_id: str, user_id: str):
                 )
                 decrypted_messages.append(decrypted_msg)
             except Exception as e:
-                # Skip corrupted messages
+                print(f"Error decrypting message: {msg}, error: {e}")
                 continue
-        
         return decrypted_messages
-        
     except Exception as e:
+        print(f"Error in get_chat_messages: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/chats")
 async def get_user_chats(user_id: str):
     try:
         chats = await supabase_service.get_user_chats(user_id)
+        print(f"Fetched chats: {chats}")
         return chats
     except Exception as e:
+        print(f"Error in get_user_chats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.websocket("/ws/{user_id}")

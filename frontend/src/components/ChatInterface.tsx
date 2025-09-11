@@ -68,7 +68,7 @@ export default function ChatInterface({
     
     websocket.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      setMessages(prev => [...prev, message])
+  setMessages(prev => [...(Array.isArray(prev) ? prev : []), message])
     }
     
     setWs(websocket)
@@ -78,7 +78,7 @@ export default function ChatInterface({
     try {
       const response = await fetch(`http://localhost:8000/api/messages/chat/${chatPartnerId}?user_id=${currentUserId}`)
       const data = await response.json()
-      setMessages(data || [])
+  setMessages(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error('Failed to load messages')
     }
@@ -102,7 +102,7 @@ export default function ChatInterface({
       sender_username: currentUsername,
       ai_analysis: undefined
     }
-    setMessages(prev => [...prev, tempMessage])
+  setMessages(prev => [...(Array.isArray(prev) ? prev : []), tempMessage])
     
     try {
       const response = await fetch('http://localhost:8000/api/messages/send', {
@@ -118,14 +118,14 @@ export default function ChatInterface({
       if (response.ok) {
         const result = await response.json()
         // Remove temp message and add real message with AI analysis
-        setMessages(prev => prev.filter(m => m.id !== tempMessage.id))
+  setMessages(prev => (Array.isArray(prev) ? prev : []).filter(m => m.id !== tempMessage.id))
         loadMessages()
         onNewMessage?.()
       }
     } catch (err) {
       console.error('Failed to send message')
       // Remove temp message on error
-      setMessages(prev => prev.filter(m => m.id !== tempMessage.id))
+  setMessages(prev => (Array.isArray(prev) ? prev : []).filter(m => m.id !== tempMessage.id))
       setNewMessage(messageContent)
     } finally {
       setLoading(false)
@@ -267,12 +267,12 @@ export default function ChatInterface({
 
       {/* Messages Area */}
       <div style={{
-        flex: 1,
+        flex: 2, // Expand chat section
         overflowY: 'auto',
-        padding: '1rem',
+        padding: '2rem', // More padding for expanded look
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       }}>
-        {messages.map((message) => (
+  {(Array.isArray(messages) ? messages : []).map((message) => (
           <div
             key={message.id}
             style={{
@@ -346,8 +346,8 @@ export default function ChatInterface({
                                message.status === 'flagged' ? '#d97706' : '#dc2626',
                     color: 'white'
                   }}>
-                    {getStatusIcon(message.status)}
-                    <span>{message.status.toUpperCase()}</span>
+                    {/* Show fuzzy_score instead of flagged status */}
+                    <span>Fuzzy Score: {typeof message.fuzzy_score !== 'undefined' ? message.fuzzy_score : 'N/A'}</span>
                   </div>
                 </div>
                 

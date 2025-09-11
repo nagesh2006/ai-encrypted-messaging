@@ -30,9 +30,9 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:8000/api/messages/chats?user_id=${userId}`)
       const data = await response.json()
-      
+      const chatArray = Array.isArray(data) ? data : [];
       const chatObjects = await Promise.all(
-        data.map(async (chatId: string) => {
+        chatArray.map(async (chatId: string) => {
           const username = await getUsernameById(chatId)
           return {
             id: chatId,
@@ -41,7 +41,6 @@ export default function Home() {
           }
         })
       )
-      
       setChats(chatObjects)
     } catch (error) {
       console.error('Failed to load chats:', error)

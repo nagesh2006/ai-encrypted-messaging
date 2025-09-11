@@ -20,30 +20,39 @@ class SupabaseService:
     
     async def get_messages(self, user_id: str, chat_partner_id: str) -> list:
         try:
-            result = self.supabase.table('messages').select("*").or_(
-                f"and(sender_id.eq.{user_id},recipient_id.eq.{chat_partner_id}),"
-                f"and(sender_id.eq.{chat_partner_id},recipient_id.eq.{user_id})"
-            ).order('created_at').execute()
-            return result.data
+            # Query messages where user is sender and chat_partner is recipient
+            result1 = self.supabase.table('messages').select("*") \
+                .eq('sender_id', user_id).eq('recipient_id', chat_partner_id) \
+                .order('created_at').execute()
+            # Query messages where user is recipient and chat_partner is sender
+            result2 = self.supabase.table('messages').select("*") \
+                .eq('sender_id', chat_partner_id).eq('recipient_id', user_id) \
+                .order('created_at').execute()
+            # Combine and sort all messages
+            all_msgs = (result1.data or []) + (result2.data or [])
+            all_msgs.sort(key=lambda x: x.get('created_at'))
+            return all_msgs
         except Exception as e:
             raise Exception(f"Failed to get messages: {str(e)}")
     
     async def get_user_chats(self, user_id: str) -> list:
         try:
-            result = self.supabase.table('messages').select(
+            # Get chats where user is sender
+            result1 = self.supabase.table('messages').select(
                 "sender_id, recipient_id, created_at"
-            ).or_(
-                f"sender_id.eq.{user_id},recipient_id.eq.{user_id}"
-            ).order('created_at', desc=True).execute()
-            
+            ).eq('sender_id', user_id).order('created_at', desc=True).execute()
+            # Get chats where user is recipient
+            result2 = self.supabase.table('messages').select(
+                "sender_id, recipient_id, created_at"
+            ).eq('recipient_id', user_id).order('created_at', desc=True).execute()
             # Get unique chat partners
             partners = set()
-            for msg in result.data:
-                if msg['sender_id'] != user_id:
-                    partners.add(msg['sender_id'])
+            for msg in (result1.data or []):
                 if msg['recipient_id'] != user_id:
                     partners.add(msg['recipient_id'])
-            
+            for msg in (result2.data or []):
+                if msg['sender_id'] != user_id:
+                    partners.add(msg['sender_id'])
             return list(partners)
         except Exception as e:
             raise Exception(f"Failed to get user chats: {str(e)}")
