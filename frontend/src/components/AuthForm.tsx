@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Shield, Mail, User, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import TermsModal from './TermsModal'
+import { authManager } from '@/lib/auth'
 
 interface AuthFormProps {
   onAuthSuccess: (userId: string, email?: string, username?: string) => void
@@ -14,9 +15,12 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     email: '',
     username: '',
     password: '',
-    otp: ''
+    otp: '',
+    rememberMe: false,
+    newPassword: '',
+    confirmPassword: ''
   })
-  const [step, setStep] = useState<'form' | 'otp' | 'forgot'>('form')
+  const [step, setStep] = useState<'form' | 'otp' | 'forgot' | 'reset'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userId, setUserId] = useState('')
@@ -35,12 +39,21 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: formData.email,
-              password: formData.password
+              password: formData.password,
+              remember_me: formData.rememberMe
             })
           })
           const result = await response.json()
           
           if (result.success) {
+            // Store tokens using auth manager
+            authManager.setTokens({
+              access_token: result.access_token,
+              refresh_token: result.refresh_token,
+              user_id: result.user_id,
+              email: result.email,
+              username: result.username
+            })
             onAuthSuccess(result.user_id, result.email, result.username)
           } else {
             setError(result.message)
@@ -63,6 +76,45 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           } else {
             setError(result.message)
           }
+        }
+      } else if (step === 'forgot') {
+        const response = await fetch('http://localhost:8000/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email
+          })
+        })
+        const result = await response.json()
+        
+        if (result.success) {
+          setStep('reset')
+        } else {
+          setError(result.message)
+        }
+      } else if (step === 'reset') {
+        if (formData.newPassword !== formData.confirmPassword) {
+          setError('Passwords do not match')
+          return
+        }
+        
+        const response = await fetch('http://localhost:8000/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            otp_code: formData.otp,
+            new_password: formData.newPassword
+          })
+        })
+        const result = await response.json()
+        
+        if (result.success) {
+          setStep('form')
+          setError('')
+          alert('Password reset successfully! Please login with your new password.')
+        } else {
+          setError(result.message)
         }
       } else if (step === 'otp') {
         const response = await fetch('http://localhost:8000/api/auth/verify-otp', {
@@ -170,7 +222,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             <h2 className="text-3xl font-bold text-white mb-2">
               Reset Password
             </h2>
-            <p className="text-gray-400">Enter your email to receive a reset link</p>
+            <p className="text-gray-400">Enter your email to receive a reset code</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -181,7 +233,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 placeholder="Email address"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="input-primary pl-12"
+                className="w-full p-4 pl-12 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent backdrop-blur-sm"
                 required
               />
             </div>
@@ -195,12 +247,97 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full group"
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transform hover:scale-105 transition-all shadow-lg flex items-center justify-center space-x-2"
             >
-              <span className="flex items-center justify-center space-x-2">
-                <span>{loading ? 'Sending...' : 'Send Reset Link'}</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
+              <span>{loading ? 'Sending...' : 'Send Reset Code'}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setStep('form')}
+              className="w-full text-gray-400 hover:text-white transition-colors"
+            >
+              Back to Sign In
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'reset') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl animate-float" style={{animationDelay: '2s'}}></div>
+        </div>
+
+        <div className="card max-w-md w-full relative z-10 animate-fadeInUp">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-glow">
+              <Lock className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">
+              Reset Password
+            </h2>
+            <p className="text-gray-400">
+              Enter the code sent to <span className="text-red-400 font-medium">{formData.email}</span>
+            </p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="000000"
+                value={formData.otp}
+                onChange={(e) => setFormData({...formData, otp: e.target.value})}
+                className="w-full p-4 text-center text-2xl font-mono tracking-widest bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent backdrop-blur-sm"
+                maxLength={6}
+                required
+              />
+            </div>
+            
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="password"
+                placeholder="New Password (8+ chars, 1 uppercase, 1 number, 1 symbol)"
+                value={formData.newPassword}
+                onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                className="w-full p-4 pl-12 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent backdrop-blur-sm"
+                required
+              />
+            </div>
+            
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                className="w-full p-4 pl-12 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent backdrop-blur-sm"
+                required
+              />
+            </div>
+            
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm backdrop-blur-sm">
+                {error}
+              </div>
+            )}
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-4 rounded-xl font-semibold hover:from-red-700 hover:to-orange-700 disabled:opacity-50 transform hover:scale-105 transition-all shadow-lg flex items-center justify-center space-x-2"
+            >
+              <span>{loading ? 'Resetting...' : 'Reset Password'}</span>
+              <ArrowRight className="w-5 h-5" />
             </button>
             
             <button
@@ -423,7 +560,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             }} />
             <input
               type="password"
-              placeholder="Password"
+              placeholder={!isLogin ? "Password (8+ chars, 1 uppercase, 1 number, 1 symbol)" : "Password"}
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               style={{
@@ -451,6 +588,25 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
               backdropFilter: 'blur(8px)'
             }}>
               {error}
+            </div>
+          )}
+          
+          {isLogin && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={formData.rememberMe}
+                onChange={(e) => setFormData({...formData, rememberMe: e.target.checked})}
+                style={{
+                  width: '1rem',
+                  height: '1rem',
+                  accentColor: '#667eea'
+                }}
+              />
+              <label htmlFor="rememberMe" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>
+                Remember me for 30 days
+              </label>
             </div>
           )}
           

@@ -1,15 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MessageCircle, Users, LogOut, Settings, Plus, Shield, Sparkles, Zap } from 'lucide-react'
 import AuthForm from '@/components/AuthForm'
 import ChatInterface from '@/components/ChatInterface'
 import UserSearchModal from '@/components/UserSearchModal'
 import ProfileModal from '@/components/ProfileModal'
+import AIVisualization from '@/components/AIVisualization'
+import { authManager } from '@/lib/auth'
 
 export default function Home() {
   const [user, setUser] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedChat, setSelectedChat] = useState<string | null>(null)
   const [chats, setChats] = useState<{id: string, username: string, lastMessage?: string}[]>([])
   const [chatPartnerUsername, setChatPartnerUsername] = useState<string>('')
@@ -52,8 +55,29 @@ export default function Home() {
     setUsername(userUsername || null)
     loadChats(userId)
   }
+  
+  // Auto-login on component mount
+  useEffect(() => {
+    const tryAutoLogin = async () => {
+      try {
+        const tokens = await authManager.autoLogin()
+        if (tokens) {
+          setUser(tokens.user_id)
+          setUsername(tokens.username)
+          loadChats(tokens.user_id)
+        }
+      } catch (error) {
+        console.error('Auto-login failed:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    tryAutoLogin()
+  }, [])
 
   const handleLogout = () => {
+    authManager.logout()
     setUser(null)
     setUsername(null)
     setSelectedChat(null)
@@ -76,6 +100,38 @@ export default function Home() {
     })
   }
 
+  if (isLoading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          color: 'white'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 100%)',
+            borderRadius: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px',
+            animation: 'spin 1s linear infinite'
+          }}>
+            <Shield size={32} color="white" />
+          </div>
+          <p style={{ fontSize: '18px', fontWeight: '600' }}>Loading AI SecureChat...</p>
+        </div>
+      </div>
+    )
+  }
+  
   if (!user) {
     return <AuthForm onAuthSuccess={handleAuthSuccess} />
   }
@@ -385,7 +441,7 @@ export default function Home() {
       </div>
 
       {/* Main Chat Area */}
-      <div style={{ flex: 1, display: selectedChat ? 'flex' : 'flex' }}>
+      <div style={{ flex: 1, display: 'flex' }}>
         {selectedChat ? (
           <ChatInterface 
             currentUserId={user} 
@@ -398,13 +454,17 @@ export default function Home() {
         ) : (
           <div style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(20px)',
             width: '100%'
           }}>
+            {/* Welcome Section */}
+            <div style={{
+              width: '70%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(20px)'
+            }}>
             <div style={{
               textAlign: 'center',
               padding: '32px'
@@ -478,6 +538,18 @@ export default function Home() {
                   Secure
                 </div>
               </div>
+            </div>
+            </div>
+            
+            {/* AI Visualization Section */}
+            <div style={{
+              width: '30%',
+              minWidth: '350px',
+              background: 'rgba(17, 24, 39, 0.3)',
+              backdropFilter: 'blur(20px)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <AIVisualization isActive={false} />
             </div>
           </div>
         )}

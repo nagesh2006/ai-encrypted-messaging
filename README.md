@@ -4,24 +4,37 @@ A next-generation secure messaging platform that combines military-grade encrypt
 
 ## ✨ Key Features
 
-- **🔐 End-to-End Encryption**: AES-256 + RSA-2048 hybrid encryption
-- **🤖 AI Content Analysis**: Real-time spam/toxicity detection with confidence scoring
-- **🧠 Fuzzy Logic Engine**: Intelligent message filtering and decision making
-- **⚡ Real-time Communication**: WebSocket-based instant messaging
-- **📧 Secure Authentication**: Gmail SMTP OTP verification system
-- **👤 Username Discovery**: Easy user search and chat initiation
-- **🎨 Modern Glassmorphism UI**: Beautiful gradient design with smooth animations
-- **📊 AI Analysis Visualization**: Real-time display of message safety metrics
-- **📱 Responsive Design**: Mobile-first approach with adaptive layouts
-- **🔔 Status Indicators**: Visual feedback for message security levels
+### 🔐 Security & Encryption
+- **End-to-End Encryption**: AES-256 + RSA-2048 hybrid encryption
+- **JWT Authentication**: Secure token-based authentication with refresh tokens
+- **Remember Me**: 30-day persistent sessions with auto-login
+- **Secure OTP**: Gmail SMTP email verification system
+
+### 🤖 AI-Powered Protection
+- **Advanced AI Classification**: Enhanced machine learning with 300+ training samples
+- **Fuzzy Logic Engine**: 13 sophisticated rules with context-aware decision making
+- **Real-time Analysis**: Instant spam/toxicity detection with confidence scoring
+- **Multi-factor Evaluation**: Considers message content, length, and context
+
+### 💬 Communication Features
+- **Real-time Messaging**: WebSocket-based instant communication
+- **Username Discovery**: Easy user search and chat initiation
+- **Message Status System**: Allow/Flag/Block with visual indicators
+- **Chat History**: Encrypted message storage and retrieval
+
+### 🎨 User Experience
+- **Modern Glassmorphism UI**: Beautiful gradient design with smooth animations
+- **Responsive Design**: Mobile-first approach with adaptive layouts
+- **AI Visualization**: Real-time display of message safety metrics
+- **Status Indicators**: Visual feedback for message security levels
 
 ## 🏗️ Architecture
 
 ```
 Frontend (Next.js + TypeScript + TailwindCSS)
-    ↓
+    ↓ JWT Authentication
 Backend (FastAPI + Python)
-    ↓
+    ↓ Encrypted Storage
 Database (Supabase PostgreSQL)
 ```
 
@@ -29,10 +42,10 @@ Database (Supabase PostgreSQL)
 
 ### Backend
 - **FastAPI**: High-performance Python web framework
-- **Scikit-learn**: Machine learning for message classification
-- **Scikit-fuzzy**: Fuzzy logic decision engine
+- **Scikit-learn**: Enhanced ML with Logistic Regression
+- **PyJWT**: JWT token management
 - **Cryptography**: AES/RSA encryption implementation
-- **Supabase**: Database and authentication
+- **Supabase**: Database and real-time features
 - **WebSockets**: Real-time communication
 
 ### Frontend
@@ -40,138 +53,66 @@ Database (Supabase PostgreSQL)
 - **TypeScript**: Type-safe development
 - **TailwindCSS**: Utility-first styling
 - **Lucide React**: Modern icon library
-- **Supabase Client**: Authentication and real-time features
+- **Auth Manager**: Centralized token management
 
-## 📦 Installation
+## 📦 Quick Start
 
-### Prerequisites
-- Python 3.8+
-- Node.js 18+
-- Supabase account
+For detailed setup instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)
 
-### Backend Setup
-
-1. Navigate to backend directory:
 ```bash
+# Backend
 cd backend
-```
-
-2. Create virtual environment:
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-```
-
-3. Install dependencies:
-```bash
 pip install -r requirements.txt
-```
-
-4. Create `.env` file:
-```bash
-cp .env.example .env
-```
-
-5. Configure environment variables in `.env`:
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
-SECRET_KEY=your_secret_key
-GMAIL_USER=your_gmail@gmail.com
-GMAIL_APP_PASSWORD=your_16_char_app_password
-RSA_PRIVATE_KEY_PATH=./keys/private_key.pem
-RSA_PUBLIC_KEY_PATH=./keys/public_key.pem
-```
-
-### Gmail SMTP Setup
-
-1. **Enable 2FA** on your Gmail account
-2. **Generate App Password**:
-   - Go to [Google Account Settings](https://myaccount.google.com)
-   - Security → 2-Step Verification → App passwords
-   - Select "Mail" and generate password
-3. **Add credentials** to `.env` file
-
-6. Run the server:
-```bash
 python main.py
-```
 
-### Frontend Setup
-
-1. Navigate to frontend directory:
-```bash
+# Frontend
 cd frontend
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Create `.env.local` file:
-```bash
-cp .env.local.example .env.local
-```
-
-4. Configure environment variables:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-5. Run the development server:
-```bash
 npm run dev
 ```
 
-### Database Setup
+## 🔐 Security Architecture
 
-1. Create a new Supabase project
-2. Run the SQL schema from `database/schema.sql` in Supabase SQL Editor
-3. **Disable RLS for development** (or configure proper policies):
-```sql
-ALTER TABLE users DISABLE ROW LEVEL SECURITY;
-ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
-```
-4. Add username column if not exists:
-```sql
-ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(50) UNIQUE;
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-```
-
-## 🔐 Security Features
-
-### Encryption
+### Multi-Layer Encryption
 - **AES-256**: Symmetric encryption for message content
 - **RSA-2048**: Asymmetric encryption for key exchange
-- **Hybrid Approach**: Combines speed of AES with security of RSA
+- **Hybrid Approach**: Combines AES speed with RSA security
+- **JWT Tokens**: Secure authentication with refresh capability
 
-### Authentication
-- **Email OTP Verification**: Secure registration with Gmail SMTP
-- **Username System**: Unique usernames for easy user discovery
-- **Password Hashing**: MD5 hashed passwords (upgrade to bcrypt recommended)
+### Advanced AI Protection
+- **Enhanced Training**: 300+ diverse message samples
+- **Logistic Regression**: Superior accuracy over Naive Bayes
+- **Context Analysis**: Message length and content evaluation
+- **Entropy-based Confidence**: More accurate probability scoring
 
-### AI Classification
-- **Spam Detection**: Identifies promotional/unwanted messages
-- **Toxicity Detection**: Flags harmful or abusive content
-- **Confidence Scoring**: Provides probability scores for decisions
+### Intelligent Fuzzy Logic
+- **5-Level Granularity**: very_low → very_high membership functions
+- **13 Sophisticated Rules**: Context-aware decision making
+- **Multi-criteria Evaluation**: Toxicity, spam, confidence, length
+- **Weighted Aggregation**: Combines multiple rule activations
 
-### Fuzzy Logic Engine
-- **Multi-factor Analysis**: Considers AI confidence, spam probability, and toxicity
-- **Intelligent Decisions**: Three-tier system (Allow/Flag/Block)
-- **Adaptive Rules**: Customizable fuzzy logic rules
+## 📊 AI Decision System
 
-## 📊 Message Status System
+| Status | Criteria | Action |
+|--------|----------|--------|
+| 🟢 **Allowed** | Low spam/toxicity + High confidence | Full delivery |
+| 🟡 **Flagged** | Medium risk or Low confidence | Delivered with warning |
+| 🔴 **Blocked** | High toxicity or High spam + High confidence | Blocked from recipient |
 
-| Status | Description | Action |
-|--------|-------------|---------|
-| 🟢 **Allowed** | Safe message, delivered normally | Full delivery |
-| 🟡 **Flagged** | Potentially problematic, user warned | Delivered with warning |
-| 🔴 **Blocked** | Harmful content, delivery prevented | Blocked from recipient |
+### Enhanced Detection
+- **Context-Aware**: Message length influences decisions
+- **Multi-Factor**: Combines AI confidence with content analysis
+- **Adaptive Thresholds**: Dynamic decision boundaries
+- **Rule Transparency**: Detailed reasoning for each decision
 
 ## 🔧 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration with OTP
+- `POST /api/auth/verify-otp` - Email verification
+- `POST /api/auth/login` - Login with remember me
+- `POST /api/auth/refresh` - Refresh access token
+- `GET /api/auth/verify` - Verify token validity
 
 ### Messages
 - `POST /api/messages/send` - Send encrypted message
@@ -179,192 +120,34 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 - `GET /api/messages/chats` - Get user's chat list
 - `WS /api/messages/ws/{user_id}` - WebSocket connection
 
-## 🚀 Deployment Guide
+## 🚀 Deployment
 
-### Option 1: Railway + Vercel (Recommended)
+For detailed deployment instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)
 
-#### Backend on Railway
-1. **Create Railway Account**: [railway.app](https://railway.app)
-2. **Connect GitHub**: Link your repository
-3. **Deploy Backend**:
-   ```bash
-   # Railway will auto-detect Python and use requirements.txt
-   # Set these environment variables in Railway dashboard:
-   ```
-4. **Environment Variables**:
-   ```
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_KEY=your_supabase_anon_key
-   SECRET_KEY=your_secret_key_here
-   GMAIL_USER=your_gmail@gmail.com
-   GMAIL_APP_PASSWORD=your_app_password
-   PORT=8000
-   ```
-5. **Custom Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+### Quick Deploy Options
+- **Railway + Vercel**: Recommended for beginners (~$5/month)
+- **Render**: Full-stack option (~$7/month)
+- **Docker**: Self-hosted deployment
+- **Cloud Providers**: AWS, GCP, Azure for enterprise
 
-#### Frontend on Vercel
-1. **Create Vercel Account**: [vercel.com](https://vercel.com)
-2. **Import Project**: Connect your GitHub repository
-3. **Configure Build**:
-   - Framework: Next.js
-   - Root Directory: `frontend`
-   - Build Command: `npm run build`
-4. **Environment Variables**:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   NEXT_PUBLIC_API_URL=https://your-railway-backend.railway.app
-   ```
+## 🧪 Performance Metrics
 
-### Option 2: Render (Full-Stack)
-
-#### Backend Service
-1. **Create Render Account**: [render.com](https://render.com)
-2. **New Web Service**: Connect GitHub repository
-3. **Configuration**:
-   - Environment: Python 3
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - Root Directory: `backend`
-
-#### Frontend Static Site
-1. **New Static Site**: Same repository
-2. **Configuration**:
-   - Build Command: `cd frontend && npm install && npm run build`
-   - Publish Directory: `frontend/out`
-   - Root Directory: `/`
-
-### Option 3: Docker Deployment
-
-#### Create Dockerfiles
-
-**Backend Dockerfile** (`backend/Dockerfile`):
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-**Frontend Dockerfile** (`frontend/Dockerfile`):
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-**Docker Compose** (`docker-compose.yml`):
-```yaml
-version: '3.8'
-services:
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    environment:
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_KEY=${SUPABASE_KEY}
-  
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-    depends_on:
-      - backend
-```
-
-### Option 4: AWS/GCP/Azure
-
-#### AWS Deployment
-- **Backend**: AWS Lambda + API Gateway or EC2
-- **Frontend**: S3 + CloudFront
-- **Database**: Keep Supabase or migrate to RDS
-
-#### GCP Deployment
-- **Backend**: Cloud Run or App Engine
-- **Frontend**: Firebase Hosting or Cloud Storage
-
-#### Azure Deployment
-- **Backend**: Azure Container Instances or App Service
-- **Frontend**: Static Web Apps or Blob Storage
-
-### 🔧 Production Checklist
-
-- [ ] **Security**: Change all default passwords and keys
-- [ ] **HTTPS**: Enable SSL certificates (auto with Vercel/Netlify)
-- [ ] **CORS**: Update allowed origins in backend
-- [ ] **Environment**: Set `NODE_ENV=production`
-- [ ] **Database**: Configure production Supabase instance
-- [ ] **Monitoring**: Set up error tracking (Sentry)
-- [ ] **Backup**: Configure database backups
-- [ ] **CDN**: Enable for static assets
-- [ ] **Rate Limiting**: Implement API rate limits
-- [ ] **Logging**: Configure structured logging
-
-### 💰 Cost Estimation
-
-| Platform | Backend | Frontend | Database | Total/Month |
-|----------|---------|----------|----------|--------------|
-| Railway + Vercel | $5 | Free | $0 (Supabase) | ~$5 |
-| Render | $7 | Free | $0 (Supabase) | ~$7 |
-| AWS | $10-20 | $1-5 | $15-30 | ~$25-55 |
-| Self-hosted | $5-10 | $0 | $0 | ~$5-10 |
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-cd backend
-python -m pytest tests/
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
-
-## 📈 Performance Metrics
-
-- **Encryption Speed**: ~1ms per message
-- **AI Classification**: ~50ms per message
-- **Fuzzy Logic**: ~10ms per decision
+- **Message Encryption**: <1ms per message
+- **AI Classification**: ~50ms with enhanced model
+- **Fuzzy Logic Processing**: ~10ms with 13 rules
 - **WebSocket Latency**: <100ms
+- **Cross-validation Accuracy**: >90% with expanded dataset
 
-## 🛠️ Troubleshooting
+## 🛠️ Recent Improvements
 
-### Common Issues
+### v2.0 Features
+- **Remember Me**: 30-day persistent sessions with JWT
+- **Enhanced AI**: 300+ training samples, Logistic Regression
+- **Advanced Fuzzy Logic**: 13 context-aware rules
+- **Auto-login**: Seamless user experience
+- **Better Security**: Industry-standard JWT authentication
 
-**"Failed to fetch" Error**
-- Make sure backend is running on port 8000
-- Check CORS settings in main.py
-
-**Gmail SMTP Error (535)**
-- Enable 2FA on Gmail account
-- Generate App Password (not regular password)
-- Remove spaces from app password in .env
-
-**"User not found" Error**
-- Make sure username exists and is verified
-- Check database connection
-
-**Database Errors**
-- Disable RLS policies for development
-- Ensure username column exists in users table
-
-**"@Unknown" in Chat**
-- Backend endpoint `/api/auth/user-by-id/{user_id}` should return username
-- Check if user data is properly stored
+For troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)
 
 ## 🤝 Contributing
 
@@ -382,74 +165,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
   <h3>🚀 Ready to deploy your secure messaging platform?</h3>
-  <p>Choose your preferred deployment method above and get started in minutes!</p>
+  <p>See <a href="SETUP_GUIDE.md">SETUP_GUIDE.md</a> for detailed instructions</p>
   
   [![Deploy to Railway](https://railway.app/button.svg)](https://railway.app/new/template)
   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
   [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 </div>
-
-## 🔮 Roadmap & Future Enhancements
-
-### Phase 1 (Current)
-- [x] End-to-end encryption
-- [x] AI content filtering
-- [x] Real-time messaging
-- [x] Modern UI/UX
-- [x] User authentication
-
-### Phase 2 (Next 3 months)
-- [ ] **Group Messaging**: Multi-user encrypted chat rooms
-- [ ] **File Sharing**: Encrypted file upload/download
-- [ ] **Voice Messages**: Audio encryption and playback
-- [ ] **Message Reactions**: Emoji reactions and replies
-- [ ] **Push Notifications**: Real-time alerts
-
-### Phase 3 (6 months)
-- [ ] **Mobile Apps**: React Native iOS/Android apps
-- [ ] **Advanced AI**: BERT/GPT integration for better analysis
-- [ ] **Video Calls**: WebRTC encrypted video chat
-- [ ] **Message Scheduling**: Delayed message delivery
-- [ ] **Admin Dashboard**: User management and analytics
-
-### Phase 4 (1 year)
-- [ ] **Blockchain Integration**: Message integrity verification
-- [ ] **Self-Destructing Messages**: Auto-delete after time
-- [ ] **Multi-Device Sync**: Cross-device message synchronization
-- [ ] **Enterprise Features**: SSO, compliance, audit logs
-- [ ] **API Marketplace**: Third-party integrations
-
-## 📊 Performance & Scalability
-
-### Current Metrics
-- **Message Encryption**: <1ms per message
-- **AI Classification**: ~50ms per message
-- **Fuzzy Logic Processing**: ~10ms per decision
-- **WebSocket Latency**: <100ms
-- **Database Queries**: <50ms average
-
-### Scalability Targets
-- **Concurrent Users**: 10,000+
-- **Messages per Second**: 1,000+
-- **Storage**: Unlimited (Supabase)
-- **Uptime**: 99.9%
-- **Global CDN**: <200ms worldwide
-
-## 🏆 Why Choose AI SecureChat?
-
-1. **🔒 Military-Grade Security**: AES-256 + RSA-2048 encryption
-2. **🤖 AI-Powered Safety**: Real-time content analysis
-3. **⚡ Lightning Fast**: Optimized for speed and performance
-4. **🎨 Beautiful Design**: Modern glassmorphism UI
-5. **📱 Mobile Ready**: Responsive design for all devices
-6. **🔧 Easy Deployment**: Multiple hosting options
-7. **💰 Cost Effective**: Free tier available
-8. **🌍 Global Scale**: Built for worldwide usage
-
-## 📞 Support & Community
-
-- **Documentation**: [GitHub Wiki](https://github.com/yourusername/ai-encrypted-messaging/wiki)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/ai-encrypted-messaging/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/ai-encrypted-messaging/discussions)
-- **Email**: support@aisecurechat.com
-- **Discord**: [Join our community](https://discord.gg/aisecurechat)

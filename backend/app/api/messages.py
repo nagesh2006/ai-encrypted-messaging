@@ -37,8 +37,8 @@ async def send_message(message: MessageCreate):
         # Classify message with AI
         ai_result = ai_classifier.classify_message(message.content)
         
-        # Apply fuzzy logic
-        fuzzy_result = fuzzy_engine.make_decision(ai_result)
+        # Apply fuzzy logic with message context
+        fuzzy_result = fuzzy_engine.make_decision(ai_result, message.content)
         
         # Prepare message data
         message_data = {
@@ -49,6 +49,7 @@ async def send_message(message: MessageCreate):
             "status": fuzzy_result['decision'],
             "ai_score": ai_result['confidence'],
             "fuzzy_score": fuzzy_result['score'],
+            "fuzzy_details": json.dumps(fuzzy_result['fuzzy_details']),
             "created_at": datetime.utcnow().isoformat()
         }
         

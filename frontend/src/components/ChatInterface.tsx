@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Send, Users, LogOut, Shield, AlertTriangle, CheckCircle, ArrowLeft } from 'lucide-react'
 import { api } from '@/lib/api'
+import AIVisualization from './AIVisualization'
 
 interface User {
   id: string
@@ -17,6 +18,9 @@ interface Message {
   status: 'allowed' | 'flagged' | 'blocked'
   created_at: string
   sender_username?: string
+  ai_score?: number
+  fuzzy_score?: number
+  fuzzy_details?: string
   ai_analysis?: {
     spam_probability: number
     toxicity_probability: number
@@ -193,9 +197,14 @@ export default function ChatInterface({
     <div style={{
       height: '100vh',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      flexDirection: 'column'
+      display: 'flex'
     }}>
+      {/* Chat Section */}
+      <div style={{
+        width: '70%',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
       {/* Header */}
       <div style={{
         background: 'rgba(17, 24, 39, 0.9)',
@@ -267,10 +276,9 @@ export default function ChatInterface({
 
       {/* Messages Area */}
       <div style={{
-        flex: 2, // Expand chat section
+        flex: 1,
         overflowY: 'auto',
-        padding: '2rem', // More padding for expanded look
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        padding: '1.5rem'
       }}>
   {(Array.isArray(messages) ? messages : []).map((message) => (
           <div
@@ -347,7 +355,7 @@ export default function ChatInterface({
                     color: 'white'
                   }}>
                     {/* Show fuzzy_score instead of flagged status */}
-                    <span>Fuzzy Score: {typeof message.fuzzy_score !== 'undefined' ? message.fuzzy_score : 'N/A'}</span>
+                    <span>Fuzzy Score: {message.fuzzy_score ? message.fuzzy_score.toFixed(2) : '0.00'}</span>
                   </div>
                 </div>
                 
@@ -427,6 +435,18 @@ export default function ChatInterface({
             <Send style={{ width: '1.25rem', height: '1.25rem' }} />
           </button>
         </div>
+      </div>
+      </div>
+      
+      {/* AI Visualization Section */}
+      <div style={{
+        width: '30%',
+        minWidth: '350px',
+        background: 'rgba(17, 24, 39, 0.3)',
+        backdropFilter: 'blur(20px)',
+        borderLeft: '1px solid rgba(255, 255, 255, 0.1)'
+      }}>
+        <AIVisualization isActive={true} />
       </div>
     </div>
   )
